@@ -30,8 +30,8 @@ enemyImg = pygame.transform.scale(enemyImg,(50,50))
 EnemyX = 600
 EnemyY = 500
 
-EnemyXchange = 0
-EnemyYchange = 0
+EnemyXchange = 0.3
+EnemyYchange = 0.3
 
 def Enemy(x,y):
     screen.blit(enemyImg,(x,y))
@@ -70,8 +70,8 @@ while running :
 
     playerX += playerXChange
     playerY += playerYChange
-    #EnemyXchange = 0.5
-    EnemyYchange = 0.5
+    EnemyX += EnemyXchange
+    EnemyY += EnemyYchange
 
     if playerX <= 0:
         playerX =800
