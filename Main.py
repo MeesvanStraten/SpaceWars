@@ -1,5 +1,7 @@
 import pygame
 import sys
+import math
+import random
 
 #Init & Settings
 pygame.init()
@@ -19,6 +21,7 @@ playerY = 100
 playerXChange = 0
 playerYChange = 0
 playerRotation = 0
+score = 0
 
 def player(x,y):
     screen.blit(playerImg,(x,y))
@@ -27,14 +30,39 @@ def player(x,y):
 enemyImg = pygame.image.load('fighter.png')
 enemyImg = pygame.transform.scale(enemyImg,(50,50))
 
-EnemyX = 600
-EnemyY = 500
+EnemyX = random.randint(0,800)
+EnemyY = random.randint(50,150)
 
-EnemyXchange = 0.3
-EnemyYchange = 0.3
+EnemyXchange = 1
+EnemyYchange = 1
 
 def Enemy(x,y):
     screen.blit(enemyImg,(x,y))
+
+
+#Laser Beam
+laserImg =  pygame.image.load('laser.png')
+laserImg = pygame.transform.scale(laserImg,(25,25))
+laserX = 0
+laserY = 0
+laserChangeY = 1
+laserChangeX = 0
+bullet_state = "ready"
+
+def fire_bullet(x,y):
+    global bullet_state
+    bullet_state = "fire"
+    screen.blit(laserImg,(x+16,y+10))
+
+
+def isCollision(enemyX,enemyY,laserX,laserY):
+    distance = math.sqrt(math.pow(enemyX-laserX,2)+ math.pow(enemyY-laserY,2))
+    if distance <27:
+        return True
+    else:
+        return False
+
+
 
 #Game
 running = True
@@ -48,30 +76,43 @@ while running :
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                print("Left is pressed")
-                playerXChange = -0.6
+                playerXChange = -1
 
             if event.key == pygame.K_RIGHT:
-                print("Right is pressed")
-                playerXChange = 0.6
+                playerXChange = 1
             if event.key == pygame.K_UP:
-                print("UP is pressed")
-                playerYChange = -0.6
-                shipSound.play()
+                playerYChange = -1
+                #shipSound.play()
             if event.key == pygame.K_DOWN:
-                print("DOWN is pressed")
-                playerYChange = 0.6
+                playerYChange = 1
             if event.key == pygame.K_SPACE:
-                print("SPACEBAR is pressed")
+                fire_bullet(playerX,playerY)
+
         if event.type == pygame.KEYUP:
-            print("Key has been released")
             playerXChange = 0
             playerYChange = 0
 
     playerX += playerXChange
     playerY += playerYChange
-    EnemyX += EnemyXchange
-    EnemyY += EnemyYchange
+    #EnemyX += EnemyXchange
+    #EnemyY += EnemyYchange
+
+
+    #laser movement
+    if bullet_state is "fire":
+        fire_bullet(playerX,laserY)
+        laserY -= laserChangeY
+
+
+#collision
+    collision = isCollision(EnemyX,EnemyY,laserX,laserY)
+    if collision:
+        laserY = 600
+        bullet_state = "ready"
+        score += 1
+        print("score is:" + score)
+
+
 
     if playerX <= 0:
         playerX =800
@@ -85,13 +126,18 @@ while running :
 
 
     if EnemyX <= 0:
-        EnemyXchange = 0.5
+        EnemyXchange = 1
     elif EnemyX >= 800:
-        EnemyXchange = -0.5
+        EnemyXchange = -1
     if EnemyY <= 0:
-       EnemyYchange = 0.5
+       EnemyYchange = 1
     elif EnemyY >= 600:
-        EnemyYchange = -0.5
+        EnemyYchange = -1
+
+    if laserY <= 0:
+        bullet_state = "ready"
+    elif laserY >= 800:
+        bullet_state = "ready"
 
 
 
